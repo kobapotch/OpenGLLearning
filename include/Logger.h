@@ -5,8 +5,11 @@
 
 using namespace std;
 
-void Log(string str){
-    cout << str << endl;
-}
+static class Logger{
+public:
+    static void Log(string str){
+        cout << str << endl;
+    }
+};
 
 #endif

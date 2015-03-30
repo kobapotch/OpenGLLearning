@@ -5,6 +5,7 @@
 
 #include "Primitive.h"
 #include "Camera.h"
+#include "Light.h"
 
 GLfloat planePos[] = {
     -10,0,-10,
@@ -26,12 +27,19 @@ GLfloat planeNor[] = {
     0,1,0
 };
 
-
 class SceneManager{
     private:
-        GLuint ubo;
+
+       
     public:
+
+        std::vector<Primitive> primitives;
+        std::vector<Light> lights;
+        Camera camera;
+
+
         SceneManager() : camera(45.0f){
+            // 背景平面の準備
             Primitive plane(&camera);
             for(int i=0;i<12;i++){
                 plane.positionData.push_back(planePos[i]);
@@ -53,9 +61,6 @@ class SceneManager{
 
         }
 
-        std::vector<Primitive> primitives;
-        Camera camera;
-
         void initScene(GLuint &shaderID){
             glClearColor(0.1f,0.1f,0.2f,1.0f);
             // glViewPort(1,1,1,1);
@@ -64,8 +69,7 @@ class SceneManager{
                 prim.Init(shaderID);
             }
 
-            ubo = glGetUniformLocation(shaderID,"lightPos");
-
+            lights[0].Init(shaderID);
 
             glEnable(GL_DEPTH_TEST);
             glEnable(GL_LESS);
@@ -77,9 +81,7 @@ class SceneManager{
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUseProgram(shaderID);
 
-            glm::vec4 lightPos = glm::vec4(-3,10,-6,1);
-            lightPos = camera.getViewMatrix() * lightPos;
-            glUniform4f(ubo,lightPos[0],lightPos[1],lightPos[2],lightPos[3]);
+            // lights[0].Set();
             
             for(auto &prim : primitives){
                 prim.Draw(shaderID);

@@ -37,7 +37,7 @@ Primitive::~Primitive(){
 //  }
 
 void Primitive::Init(GLuint shaderID){
-    Log("Primitive Init");
+    Logger::Log("Primitive Init");
    
     // VAOの作成とバインド
     glGenVertexArrays(1,&vao);
@@ -89,6 +89,7 @@ void Primitive::Init(GLuint shaderID){
     ubo.push_back(glGetUniformLocation(shaderID,"textureSampler"));
 
     glBindVertexArray(0);
+
 }
 
 float angle = 0;
@@ -102,10 +103,10 @@ void Primitive::Draw(GLuint shaderID){
     glm::mat4 MV = camera->getViewMatrix() * M;
     glm::mat4 MVP = camera->getProjectionMatrix() * MV;
 
+    // material->Set();
+
     glUseProgram(shaderID);
     glBindVertexArray(vao);
-
-
 
     // 変換行列をシェーダーに送り込む
     glUniformMatrix4fv(ubo[0],1,GL_FALSE,&MVP[0][0]);

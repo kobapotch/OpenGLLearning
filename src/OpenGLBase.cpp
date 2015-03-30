@@ -119,27 +119,27 @@ GLfloat g_uv_data[] ={
     0.0f,0.0f,
     1.0f,0.0f,
     1.0f,1.0f,
-// 全面
+    // 全面
     0.0f,1.0f,
     0.0f,0.0f,
     1.0f,0.0f,
     1.0f,1.0f,
-// 全面
+    // 全面
     0.0f,1.0f,
     0.0f,0.0f,
     1.0f,0.0f,
     1.0f,1.0f,
-// 全面
+    // 全面
     0.0f,1.0f,
     0.0f,0.0f,
     1.0f,0.0f,
     1.0f,1.0f,
-// 全面
+    // 全面
     0.0f,1.0f,
     0.0f,0.0f,
     1.0f,0.0f,
     1.0f,1.0f,
-// 全面
+    // 全面
     0.0f,1.0f,
     0.0f,0.0f,
     1.0f,0.0f,
@@ -157,6 +157,8 @@ float tricolor[] = {
     0.0f,1.0f,0.0f,
     0.0f,0.0f,1.0f
 };
+
+Material myMaterial;
 
 SceneManager makeScene(){
     SceneManager myScene;
@@ -190,6 +192,7 @@ SceneManager makeScene(){
         cube.rotate = true;
 
         tri.transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
+        cube.material = &myMaterial;
 
         myScene.primitives.push_back(cube);
         // myScene.primitives.push_back(tri);
@@ -198,6 +201,10 @@ SceneManager makeScene(){
     cube.transform.rotation = glm::vec3(0,0,0);
     cube.rotate = false;
     myScene.primitives.push_back(cube);
+
+    Light light;
+    light.position = glm::vec4(-3,-6,10,1);
+    myScene.lights.push_back(light);
 
     return myScene;
 }
@@ -258,6 +265,9 @@ int main(int argc,char* argv[]){
     SceneManager myScene = makeScene();
 
     myScene.initScene(programID);
+    myMaterial.Init(programID);
+
+    cout << "Draw Start" << endl;
 
     while(!glfwWindowShouldClose(window)){
 

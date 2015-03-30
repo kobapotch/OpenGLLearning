@@ -7,6 +7,7 @@
 
 #include "Transform.h"
 #include "Camera.h"
+#include "Material.h"
 
 class Primitive{
 
@@ -37,6 +38,7 @@ class Primitive{
         std::vector<GLfloat> uvData;
 
         Transform transform;
+        Material* material;
 
         void Init(GLuint shaderID);
         void SetTexture(GLuint id){

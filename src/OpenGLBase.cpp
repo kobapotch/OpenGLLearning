@@ -174,39 +174,46 @@ SceneManager makeScene(){
         cube.uvData.push_back(g_uv_data[i]);
     }
 
-    Primitive tri(&myScene.camera);
-    for(int i=0;i<9;i++){
-        tri.positionData.push_back(tripos[i]);
-        tri.colorData.push_back(tricolor[i]);
-    }
-    tri.transform.position = glm::vec3(2,0,0);
-
     std::random_device rnd;
     std::mt19937 mt( rnd() );
     std::uniform_int_distribution<> rand100(-6,6);
 
     for(int i=0;i<10;i++){
-        cube.transform.position = glm::vec3(rand100(mt),rand100(mt)+6,rand100(mt));
+        cube.transform.position = glm::vec3(rand100(mt),rand100(mt)+3,rand100(mt));
         cube.transform.rotation = glm::vec3(rand100(mt)*100,rand100(mt)*100,rand100(mt)*100);
         cube.transform.scale = glm::vec3(2,2,2);
         cube.rotate = true;
 
-        tri.transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
         cube.material = &myMaterial;
 
         myScene.primitives.push_back(cube);
-        // myScene.primitives.push_back(tri);
     }
+
     cube.transform.position = glm::vec3(0,0,0);
     cube.transform.rotation = glm::vec3(0,0,0);
     cube.rotate = false;
     myScene.primitives.push_back(cube);
 
     Light light;
-    light.position = glm::vec4(-9,0,-9,1);
-    myScene.lights.push_back(light);
+    light.position = glm::vec4(-8,15,8,1);
+    light.La = glm::vec3(0.05,0.05,0.05);
+    light.Ld = glm::vec3(0.4,0.4,0.4);
+    light.Ls = glm::vec3(1.0,0.2,0.2);
+    myScene.addLight(light);
 
-    return myScene;
+    light.position = glm::vec4(-8,15,-8,1);
+    light.La = glm::vec3(0.05,0.05,0.05);
+    light.Ld = glm::vec3(0.4,0.4,0.4);
+    light.Ls = glm::vec3(0.2,1.0,0.2);
+    myScene.addLight(light);
+ 
+    light.position = glm::vec4(8,15,-8,1);
+    light.La = glm::vec3(0.1,0.1,0.1);
+    light.Ld = glm::vec3(0.4,0.4,0.4);
+    light.Ls = glm::vec3(0.2,0.2,1.0);
+    myScene.addLight(light);
+
+   return myScene;
 }
 
 

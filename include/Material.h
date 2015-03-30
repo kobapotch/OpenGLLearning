@@ -22,8 +22,8 @@ class Material{
 
     Material(){
         Ka = glm::vec3(1,1,1);
-        Kd = glm::vec3(1,0.3,0.3);
-        Ks = glm::vec3(0.3,0.3,1);
+        Kd = glm::vec3(1,1,1);
+        Ks = glm::vec3(1,1,1);
         shininess = 20;
     }
 

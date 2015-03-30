@@ -48,17 +48,22 @@ class SceneManager{
             }for(int i=0;i<8;i++){
                 plane.uvData.push_back(planeuv[i]);
             }
-            plane.transform.position = glm::vec3(0,-3,0);
+            plane.transform.position = glm::vec3(0,-6,0);
             primitives.push_back(plane);
 
-            plane.transform.position = glm::vec3(0,7,-10);
+            plane.transform.position = glm::vec3(0,4,-10);
             plane.transform.rotation = glm::vec3(90,0,0);
             primitives.push_back(plane);
         
-             plane.transform.position = glm::vec3(-10,7,0);
+             plane.transform.position = glm::vec3(-10,4,0);
             plane.transform.rotation = glm:: vec3(0,0,-90);
             primitives.push_back(plane);
 
+        }
+
+        void addLight(Light light){
+            light.setID(lights.size());
+            lights.push_back(light);
         }
 
         void initScene(GLuint &shaderID){
@@ -68,8 +73,10 @@ class SceneManager{
             for(auto &prim : primitives){
                 prim.Init(shaderID);
             }
-
-            lights[0].Init(shaderID);
+            
+            for(auto &light : lights){
+                light.Init(shaderID);
+            }
 
             glEnable(GL_DEPTH_TEST);
             glEnable(GL_LESS);
@@ -81,8 +88,10 @@ class SceneManager{
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUseProgram(shaderID);
 
-            lights[0].Set(camera.getViewMatrix());
-            
+            for(auto light : lights){
+                light.Set(camera.getViewMatrix());
+            }
+
             for(auto &prim : primitives){
                 prim.Draw(shaderID);
             }

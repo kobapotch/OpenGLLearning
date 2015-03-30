@@ -6,7 +6,7 @@ struct LightInfo{
     vec3 Ld;
     vec3 Ls;
 };
-uniform LightInfo Light;
+uniform LightInfo Light[10];
 
 uniform MaterialInfo{
     vec3 Ka;    // アンビエント反射率
@@ -27,28 +27,31 @@ out vec4 color;
 
 
 // フォーンモデルに基づくADS計算
-vec3 phongADS(vec4 pos, vec3 norm){
+vec3 phongADS(vec4 pos, vec3 norm,int lightIndex){
 
     norm = normalize(norm);
     // s:positionから見た光の方向　r:光の反射方向　v:視点方向
-    vec3 s = normalize(Light.position.xyz - pos.xyz);
+    vec3 s = normalize(Light[lightIndex].position.xyz - pos.xyz);
     vec3 r = reflect(-s,norm);
     vec3 v = normalize(-pos.xyz);
 
-    vec3 ambient = Light.La * Ka;
+    vec3 ambient = Light[lightIndex].La * Ka;
 
     float SdotN = max( dot(s,norm) , 0 );
-    vec3 diffuse = Light.Ld * Kd * SdotN;
+    vec3 diffuse = Light[lightIndex].Ld * Kd * SdotN;
 
     vec3 spec = vec3(0.0);
     if(SdotN > 0.0)
-        spec = Light.Ls * Ks * pow( max(dot(r,v),0.0), shininess );
+        spec = Light[lightIndex].Ls * Ks * pow( max(dot(r,v),0.0), shininess );
 
-    return ambient + diffuse + spec;
+    return ambient + spec;
 
 }
 
 void main(){
-    vec3 lightIntensity = phongADS(fragmentPosition,fragmentNormal);
-    color.rgb = (lightIntensity + vec3(0.2)) * texture(textureSampler,fragmentUV).xyz;
+    vec3 lightIntensity = vec3(0.0);
+    for(int i=0;i<10;i++){
+        lightIntensity += phongADS(fragmentPosition,fragmentNormal,i);
+    }
+    color.rgb = (lightIntensity) * texture(textureSampler,fragmentUV).xyz;
 }

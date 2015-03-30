@@ -203,7 +203,7 @@ SceneManager makeScene(){
     myScene.primitives.push_back(cube);
 
     Light light;
-    light.position = glm::vec4(-3,-6,10,1);
+    light.position = glm::vec4(-9,0,-9,1);
     myScene.lights.push_back(light);
 
     return myScene;

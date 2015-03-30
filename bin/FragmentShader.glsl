@@ -1,12 +1,12 @@
 #version 410 core
 
-uniform LightInfo{
+struct LightInfo{
     vec4 position;
     vec3 La;    // アンビエント強度RGB
     vec3 Ld;
     vec3 Ls;
 };
-// uniform LightInfo Light;
+uniform LightInfo Light;
 
 uniform MaterialInfo{
     vec3 Ka;    // アンビエント反射率
@@ -29,19 +29,20 @@ out vec4 color;
 // フォーンモデルに基づくADS計算
 vec3 phongADS(vec4 pos, vec3 norm){
 
+    norm = normalize(norm);
     // s:positionから見た光の方向　r:光の反射方向　v:視点方向
-    vec3 s = normalize(position.xyz - pos.xyz);
+    vec3 s = normalize(Light.position.xyz - pos.xyz);
     vec3 r = reflect(-s,norm);
     vec3 v = normalize(-pos.xyz);
 
-    vec3 ambient = La * Ka * 0.0;
+    vec3 ambient = Light.La * Ka;
 
     float SdotN = max( dot(s,norm) , 0 );
-    vec3 diffuse = Ld * Kd * SdotN;
+    vec3 diffuse = Light.Ld * Kd * SdotN;
 
     vec3 spec = vec3(0.0);
     if(SdotN > 0.0)
-        spec = Ls * Ks * pow( max(dot(r,v),0.0), shininess );
+        spec = Light.Ls * Ks * pow( max(dot(r,v),0.0), shininess );
 
     return ambient + diffuse + spec;
 
@@ -49,5 +50,5 @@ vec3 phongADS(vec4 pos, vec3 norm){
 
 void main(){
     vec3 lightIntensity = phongADS(fragmentPosition,fragmentNormal);
-    color.rgb = lightIntensity * texture(textureSampler,fragmentUV).xyz;
+    color.rgb = (lightIntensity + vec3(0.2)) * texture(textureSampler,fragmentUV).xyz;
 }

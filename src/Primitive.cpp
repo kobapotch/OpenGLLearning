@@ -134,6 +134,8 @@ void Primitive::Draw(GLuint shaderID){
     // プリミティブによって描画方法を変えられる
     DrawVertex();
 
+    glBindTexture(GL_TEXTURE_2D,0);
+
     glBindVertexArray(0);
 
 }

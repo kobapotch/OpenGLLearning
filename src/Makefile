@@ -1,4 +1,4 @@
-CFLAGS = -Wextra
+CFLAGS = -Wextra -g -std=c++11
 FRAMEWORKS = OpenGL
 LIBS = -lglfw3 -lGLEW
 INCLUDE = -I../include

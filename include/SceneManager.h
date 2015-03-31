@@ -29,12 +29,12 @@ class SceneManager{
             
             plane.texture = &texture;
             // 奥
-            plane.transform.scale = glm::vec3(20,20,1);
-            plane.transform.position = glm::vec3(0,0,-10);
+            plane.transform.scale = glm::vec3(40,40,1);
+            plane.transform.position = glm::vec3(0,10,-20);
             planes.push_back(plane);
 
             // 左
-            plane.transform.position = glm::vec3(-10,0,0);
+            plane.transform.position = glm::vec3(-20,10,0);
             plane.transform.rotation = glm::vec3(0,90,0);
             planes.push_back(plane);
         

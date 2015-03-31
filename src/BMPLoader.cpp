@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "BMPLoader.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -42,6 +43,7 @@ void BMPLoader::loadBMP(const char* filename){
 
 GLuint BMPLoader::makeTexture(){
 
+
     glActiveTexture(GL_TEXTURE0);
 
     glGenTextures(1,&textureID);
@@ -60,10 +62,13 @@ GLuint BMPLoader::makeTexture(){
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 
+    glBindTexture(GL_TEXTURE_2D,0);
+
     return textureID;
 }
 
 void BMPLoader::setTexture(){
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D,textureID);
     // glTexSubImage2D ( GL_TEXTURE_2D, 0, GL_RGB, width,height,0, GL_BGR,GL_UNSIGNED_BYTE, &data[0]);

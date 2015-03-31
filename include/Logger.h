@@ -5,7 +5,7 @@
 
 using namespace std;
 
-static class Logger{
+class Logger{
 public:
     static void Log(string str){
         cout << str << endl;

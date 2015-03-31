@@ -48,12 +48,38 @@ vec3 phongADS(vec4 pos, vec3 norm,int lightIndex){
 
 }
 
+// Blinn-Phongモデル
+vec3 BlinnPhongADS(vec4 pos, vec3 norm,int lightIndex){
+
+    norm = normalize(norm);
+    // s:positionから見た光の方向　v:視点方向 h:ハーフベクトル
+    vec3 s = normalize(Light[lightIndex].position.xyz - pos.xyz);
+    vec3 v = normalize(-pos.xyz);
+    vec3 h = normalize(s+v);
+
+    vec3 ambient = Light[lightIndex].La * Ka;
+
+    float SdotN = max( dot(s,norm) , 0 );
+    vec3 diffuse = Light[lightIndex].Ld * Kd * SdotN;
+
+    vec3 spec = vec3(0.0);
+    if(SdotN > 0.0)
+        spec = Light[lightIndex].Ls * Ks * pow( max(dot(h,norm),0.0), shininess );
+
+    return (ambient + diffuse) * texture(textureSampler,fragmentUV).xyz + spec;
+
+
+}
+
+
 void main(){
     vec3 lightIntensity = vec3(0.0);
     for(int i=0;i<10;i++){
-        lightIntensity += phongADS(fragmentPosition,fragmentNormal,i);
+        lightIntensity += BlinnPhongADS(fragmentPosition,fragmentNormal,i);
     }
-    color.rgb = (lightIntensity) * texture(textureSampler,fragmentUV).xyz;
-    color.rgb = color.rgb * 1 /( 1 +  0.01 * (-fragmentPosition.z)) 
-        + vec3(0.005)*(-fragmentPosition.z);
+    color.rgb = (lightIntensity) ;
+
+    //color.rgb = color.rgb * 1 /( 1 +  0.01 * (-fragmentPosition.z)) 
+   //  + vec3(0.005)*(-fragmentPosition.z);
+
 }

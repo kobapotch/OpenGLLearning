@@ -22,14 +22,14 @@ BMPLoader loader2;
 
 SceneManager makeScene(){
     SceneManager myScene(loader1);
-    myScene.camera.transform.position = glm::vec3(3,8,20);
+    myScene.camera.transform.position = glm::vec3(3,8,30);
 
     
     std::random_device rnd;
     std::mt19937 mt( rnd() );
     std::uniform_int_distribution<> rand100(-8,8);
 
-    for(int i=0;i<10;i++){
+    for(int i=0;i<0;i++){
 
         std::shared_ptr<Primitive> cube(new Cube(&myScene.camera) );
         cube->texture = &loader2;
@@ -43,29 +43,43 @@ SceneManager makeScene(){
 
         myScene.primitives.push_back(cube);
     }
+    for(int i=0;i<10;i++){
+        std::shared_ptr<Primitive> torus(new Torus(&myScene.camera) );
+        torus->texture = &loader2;
+
+        torus->transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
+        torus->transform.rotation = glm::vec3(rand100(mt)*100,rand100(mt)*100,rand100(mt)*100);
+        torus->transform.scale = glm::vec3(3);
+        torus->rotate = true;
+
+        torus->material = &myMaterial;
+
+        myScene.primitives.push_back(torus);
+    }
 
     std::shared_ptr<Primitive> cube(new Cube(&myScene.camera));
     cube->transform.scale  = glm::vec3(2,2,2);
     cube->transform.position = glm::vec3(0,0,0);
     cube->transform.rotation = glm::vec3(0,0,0);
     cube->rotate = false;
+    cube->texture = &loader2;
     myScene.primitives.push_back(cube);
 
     Light light;
-    light.position = glm::vec4(-8,15,8,1);
-    light.La = glm::vec3(0.05,0.05,0.05);
+    light.position = glm::vec4(-15,-5,15,1);
+    light.La = glm::vec3(0.02,0.02,0.02);
     light.Ld = glm::vec3(0.4,0.4,0.4);
     light.Ls = glm::vec3(1.0,0.2,0.2);
     myScene.addLight(light);
 
-    light.position = glm::vec4(-8,15,-8,1);
-    light.La = glm::vec3(0.05,0.05,0.05);
+    light.position = glm::vec4(-15,-5,-15,1);
+    light.La = glm::vec3(0.02,0.02,0.02);
     light.Ld = glm::vec3(0.4,0.4,0.4);
     light.Ls = glm::vec3(0.2,1.0,0.2);
     myScene.addLight(light);
  
-    light.position = glm::vec4(8,15,-8,1);
-    light.La = glm::vec3(0.1,0.1,0.1);
+    light.position = glm::vec4(15,-5,-15,1);
+    light.La = glm::vec3(0.02,0.02,0.02);
     light.Ld = glm::vec3(0.4,0.4,0.4);
     light.Ls = glm::vec3(0.2,0.2,1.0);
     myScene.addLight(light);

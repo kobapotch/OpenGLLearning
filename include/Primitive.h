@@ -47,7 +47,7 @@ class Primitive{
         Material* material;
         BMPLoader* texture;
 
-        void Init(GLuint shaderID);
+        virtual void Init(GLuint shaderID);
         void SetTexture(GLuint id){ textureID = id;}
         void Draw(GLuint shaderID);
 
@@ -73,14 +73,20 @@ class Cube : public Primitive{
 // トーラス
 class Torus : public Primitive{
     private:
-        float majorRadius;
-        float minorRadius;
+        static constexpr float majorRadius = 0.5f;
+        static constexpr int majorPrecision = 20;
+        static constexpr float minorRadius = 0.25f;
+        static constexpr int minorPrecision = 10;
+        
+        GLuint ibo;
+        std::vector<GLuint> indexData;
 
     protected:
         void DrawVertex();
 
     public:
         Torus(Camera*);
+        void Init(GLuint shaderID);
 
 };
 

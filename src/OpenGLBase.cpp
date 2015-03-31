@@ -5,6 +5,9 @@
 
 #include <iostream>
 #include <random>
+#include <new>
+#include <vector>
+#include <memory>
 
 #include "ShaderManager.h"
 #include "SceneManager.h"
@@ -12,186 +15,40 @@
 
 using namespace std;
 
-GLfloat g_vertex_buffer_data[] ={
-    // 前面
-    -0.5f,0.5f,0.5f,
-    -0.5f,-0.5f,0.5f,
-    0.5f,-0.5f,0.5f,
-    0.5f,0.5f,0.5f,
-    // 上面
-    -0.5f,0.5f,-0.5f,
-    -0.5f,0.5f,0.5f,
-    0.5f,0.5f,0.5f,
-    0.5f,0.5f,-0.5f,
-    // 左面
-    -0.5f,0.5f,-0.5f,
-    -0.5f,-0.5f,-0.5f,
-    -0.5f,-0.5f,0.5f,
-    -0.5f,0.5f,0.5f,
-    // 下面
-    -0.5f,-0.5f,0.5f,
-    -0.5f,-0.5f,-0.5f,
-    0.5f,-0.5f,-0.5f,
-    0.5f,-0.5f,0.5f,
-    // 右面
-    0.5f,0.5f,0.5f,
-    0.5f,-0.5f,0.5f,
-    0.5f,-0.5f,-0.5f,
-    0.5f,0.5f,-0.5f,
-    // 裏面
-    0.5f,0.5f,-0.5f,
-    0.5f,-0.5f,-0.5f,
-    -0.5f,-0.5f,-0.5f,
-    -0.5f,0.5f,-0.5f
-};
-
-
-
-GLfloat g_color_data[] = {
-    // 前面
-    0.8f,  0.5f,  0.2f,
-    0.8f,  0.5f,  0.2f,
-    0.8f,  0.5f,  0.2f,
-    0.8f,  0.5f,  0.2f,
-    // 上面
-    0.5f,0.2f,0.8f,
-    0.5f,0.2f,0.8f,
-    0.5f,0.2f,0.8f,
-    0.5f,0.2f,0.8f,
-    // 左面
-    0.2f,0.8f,0.5f,
-    0.2f,0.8f,0.5f,
-    0.2f,0.8f,0.5f,
-    0.2f,0.8f,0.5f,
-    // 下面
-    0.8f,0.2f,0.5f,
-    0.8f,0.2f,0.5f,
-    0.8f,0.2f,0.5f,
-    0.8f,0.2f,0.5f,
-    // 右面
-    0.2f,0.5f,0.8f,
-    0.2f,0.5f,0.8f,
-    0.2f,0.5f,0.8f,
-    0.2f,0.5f,0.8f,
-    // 下面
-    0.5f,0.8f,0.2f,
-    0.5f,0.8f,0.2f,
-    0.5f,0.8f,0.2f,
-    0.5f,0.8f,0.2f
-};
-
-GLfloat g_normal_data[] = {
-    // 前面
-    0.0f,0.0f,1.0f,
-    0.0f,0.0f,1.0f,
-    0.0f,0.0f,1.0f,
-    0.0f,0.0f,1.0f,
-    // 上面
-    0.0f,1.0f,0.0f,
-    0.0f,1.0f,0.0f,
-    0.0f,1.0f,0.0f,
-    0.0f,1.0f,0.0f,
-    // 左面
-    -1.0f,0.0f,0.0f,
-    -1.0f,0.0f,0.0f,
-    -1.0f,0.0f,0.0f,
-    -1.0f,0.0f,0.0f,
-    // 下面
-    0.0f,-1.0f,0.0f,
-    0.0f,-1.0f,0.0f,
-    0.0f,-1.0f,0.0f,
-    0.0f,-1.0f,0.0f,
-    // 右面
-    1.0f,0.0f,0.0f,
-    1.0f,0.0f,0.0f,
-    1.0f,0.0f,0.0f,
-    1.0f,0.0f,0.0f,
-    // 奥面
-    0.0f,0.0f,-1.0f,
-    0.0f,0.0f,-1.0f,
-    0.0f,0.0f,-1.0f,
-    0.0f,0.0f,-1.0f
-};
-
-GLfloat g_uv_data[] ={
-    // 全面
-    0.0f,1.0f,
-    0.0f,0.0f,
-    1.0f,0.0f,
-    1.0f,1.0f,
-    // 全面
-    0.0f,1.0f,
-    0.0f,0.0f,
-    1.0f,0.0f,
-    1.0f,1.0f,
-    // 全面
-    0.0f,1.0f,
-    0.0f,0.0f,
-    1.0f,0.0f,
-    1.0f,1.0f,
-    // 全面
-    0.0f,1.0f,
-    0.0f,0.0f,
-    1.0f,0.0f,
-    1.0f,1.0f,
-    // 全面
-    0.0f,1.0f,
-    0.0f,0.0f,
-    1.0f,0.0f,
-    1.0f,1.0f,
-    // 全面
-    0.0f,1.0f,
-    0.0f,0.0f,
-    1.0f,0.0f,
-    1.0f,1.0f
-};
-
-
-float tripos[] = {
-    0.0f,1.0f,0.0f,
-    -1.0f,0.0f,0.0f,
-    1.0f,0.0f,0.0f
-};
-float tricolor[] = {
-    1.0f,0.0f,0.0f,
-    0.0f,1.0f,0.0f,
-    0.0f,0.0f,1.0f
-};
-
+// 素材達　とりあえずここにドカドカ
 Material myMaterial;
+BMPLoader loader1;
+BMPLoader loader2;
 
 SceneManager makeScene(){
-    SceneManager myScene;
+    SceneManager myScene(loader1);
     myScene.camera.transform.position = glm::vec3(3,8,20);
 
-    Primitive cube(&myScene.camera);
-    for(int i=0;i<36*3;i++){
-        cube.positionData.push_back(g_vertex_buffer_data[i]);
-        cube.colorData.push_back( g_color_data[i]);
-        cube.normalData.push_back( g_normal_data[i]);
-    }
-    for(int i=0;i<36*2;i++){
-        cube.uvData.push_back(g_uv_data[i]);
-    }
-
+    
     std::random_device rnd;
     std::mt19937 mt( rnd() );
-    std::uniform_int_distribution<> rand100(-6,6);
+    std::uniform_int_distribution<> rand100(-8,8);
 
     for(int i=0;i<10;i++){
-        cube.transform.position = glm::vec3(rand100(mt),rand100(mt)+3,rand100(mt));
-        cube.transform.rotation = glm::vec3(rand100(mt)*100,rand100(mt)*100,rand100(mt)*100);
-        cube.transform.scale = glm::vec3(2,2,2);
-        cube.rotate = true;
 
-        cube.material = &myMaterial;
+        std::shared_ptr<Primitive> cube(new Cube(&myScene.camera) );
+        cube->texture = &loader2;
+
+        cube->transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
+        cube->transform.rotation = glm::vec3(rand100(mt)*100,rand100(mt)*100,rand100(mt)*100);
+        cube->transform.scale = glm::vec3(2,2,2);
+        cube->rotate = true;
+
+        cube->material = &myMaterial;
 
         myScene.primitives.push_back(cube);
     }
 
-    cube.transform.position = glm::vec3(0,0,0);
-    cube.transform.rotation = glm::vec3(0,0,0);
-    cube.rotate = false;
+    std::shared_ptr<Primitive> cube(new Cube(&myScene.camera));
+    cube->transform.scale  = glm::vec3(2,2,2);
+    cube->transform.position = glm::vec3(0,0,0);
+    cube->transform.rotation = glm::vec3(0,0,0);
+    cube->rotate = false;
     myScene.primitives.push_back(cube);
 
     Light light;
@@ -260,9 +117,10 @@ int main(int argc,char* argv[]){
         << "GLSL version : " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
     // テクスチャの読み込み 
-    BMPLoader loader;
-    loader.loadBMP(argc >=2 ? argv[1] :"hima.bmp");
-    cout << loader.makeTexture() << endl;
+    loader1.loadBMP(argc >=2 ? argv[1] :"hima.bmp");
+    loader1.makeTexture();
+    loader2.loadBMP(argc >=3 ? argv[2] :"garasubo.bmp");
+    loader2.makeTexture();
 
     ShaderManager shaderManager;
     shaderManager.compileVertexShader("VertexShader.glsl");

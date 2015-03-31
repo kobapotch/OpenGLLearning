@@ -44,7 +44,7 @@ vec3 phongADS(vec4 pos, vec3 norm,int lightIndex){
     if(SdotN > 0.0)
         spec = Light[lightIndex].Ls * Ks * pow( max(dot(r,v),0.0), shininess );
 
-    return ambient + spec;
+    return ambient + diffuse + spec;
 
 }
 
@@ -54,4 +54,6 @@ void main(){
         lightIntensity += phongADS(fragmentPosition,fragmentNormal,i);
     }
     color.rgb = (lightIntensity) * texture(textureSampler,fragmentUV).xyz;
+    color.rgb = color.rgb * 1 /( 1 +  0.01 * (-fragmentPosition.z)) 
+        + vec3(0.005)*(-fragmentPosition.z);
 }

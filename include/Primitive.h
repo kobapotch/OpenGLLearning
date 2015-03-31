@@ -8,12 +8,12 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "Material.h"
+#include "BMPLoader.h"
 
 class Primitive{
 
     private:
-        static const int VERTEX_INFO_NUM = 4;
-        
+        static const int VERTEX_INFO_NUM = 4; 
 
         GLuint vbo[VERTEX_INFO_NUM];
         GLuint vao;
@@ -25,6 +25,12 @@ class Primitive{
         Camera* camera;
         // texture参照
         GLuint textureID = 0;
+
+    protected:
+
+        // 頂点描画部分
+        virtual void DrawVertex();
+
     public:
         Primitive(Camera*);
         ~Primitive();
@@ -39,12 +45,46 @@ class Primitive{
 
         Transform transform;
         Material* material;
+        BMPLoader* texture;
 
         void Init(GLuint shaderID);
-        void SetTexture(GLuint id){
-            textureID = id;}
+        void SetTexture(GLuint id){ textureID = id;}
         void Draw(GLuint shaderID);
 
 };
+
+// 平面
+class Plane : public Primitive{
+    protected:
+        void DrawVertex();
+    public:
+        Plane(Camera*);
+
+};
+
+// 立方体
+class Cube : public Primitive{
+    protected:
+        void DrawVertex();
+    public:
+        Cube(Camera*);
+};
+
+// トーラス
+class Torus : public Primitive{
+    private:
+        float majorRadius;
+        float minorRadius;
+
+    protected:
+        void DrawVertex();
+
+    public:
+        Torus(Camera*);
+
+};
+
+
+
 
 #endif

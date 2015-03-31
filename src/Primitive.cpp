@@ -33,8 +33,22 @@ Primitive::Primitive(Camera* m_camera){
 }
 Primitive::~Primitive(){
 }
-// Primitive::Primitive(const Primitive& obj){
-//  }
+/*
+Primitive::Primitive(const Primitive& obj){
+    for(int i=0;i<VERTEX_INFO_NUM;i++){
+        vbo[i] = obj.vbo[i];
+    }
+    vao = obj.vao;
+    ubo = obj.ubo;
+
+    camera = obj.camera;
+    textureID = obj.textureID;
+
+    positionData = obj.positionData;
+    colorData = obj.colorData;
+
+}
+*/
 
 void Primitive::Init(GLuint shaderID){
     Logger::Log("Primitive Init");
@@ -103,10 +117,11 @@ void Primitive::Draw(GLuint shaderID){
     glm::mat4 MV = camera->getViewMatrix() * M;
     glm::mat4 MVP = camera->getProjectionMatrix() * MV;
 
-    // material->Set();
-
     glUseProgram(shaderID);
     glBindVertexArray(vao);
+
+    // テクスチャの切り替え
+    if(texture != NULL) texture->setTexture();
 
     // 変換行列をシェーダーに送り込む
     glUniformMatrix4fv(ubo[0],1,GL_FALSE,&MVP[0][0]);
@@ -115,10 +130,17 @@ void Primitive::Draw(GLuint shaderID){
     // マルチテクスチャの番号を入れることに注意
     glUniform1i(ubo[3],0);
 
-    // 頂点0から初めて，3つの頂点を利用して
-    for(int i=0;i<6;i++){
-        glDrawArrays(GL_TRIANGLE_FAN,i*4,4);
-    }
+   
+    // プリミティブによって描画方法を変えられる
+    DrawVertex();
+
     glBindVertexArray(0);
+
+}
+
+
+// デフォルトの描画方法
+void Primitive::DrawVertex(){
+    glDrawArrays(GL_TRIANGLES,0,positionData.size());
 
 }

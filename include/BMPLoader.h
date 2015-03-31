@@ -6,6 +6,8 @@
 
 class BMPLoader{
 
+    int ID;
+
     unsigned int dataPos;
     unsigned int width,height;
     unsigned int imageSize;
@@ -17,6 +19,7 @@ public:
     void loadBMP(const char* filename);
     GLuint makeTexture();
     GLuint getTextureID();
+    void setTexture();
 
 };
 

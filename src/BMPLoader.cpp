@@ -48,7 +48,7 @@ GLuint BMPLoader::makeTexture(){
 
     glBindTexture(GL_TEXTURE_2D,textureID);
 
-   glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_BGR,GL_UNSIGNED_BYTE,&data[0]);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_BGR,GL_UNSIGNED_BYTE,&data[0]);
    /*
     float buf[] = {
         1,0,0, 0,1,0, 0,0,1,
@@ -61,6 +61,13 @@ GLuint BMPLoader::makeTexture(){
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 
     return textureID;
+}
+
+void BMPLoader::setTexture(){
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,textureID);
+    // glTexSubImage2D ( GL_TEXTURE_2D, 0, GL_RGB, width,height,0, GL_BGR,GL_UNSIGNED_BYTE, &data[0]);
+
 }
 
 

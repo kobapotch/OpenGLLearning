@@ -2,30 +2,14 @@
 #define _KOBA_SCENEMANAGER_INCLUDED
 
 #include <vector>
+#include <memory>
 
 #include "Primitive.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Logger.h"
 
-GLfloat planePos[] = {
-    -10,0,-10,
-    -10,0,10,
-    10,0,10,
-    10,0,-10,
-};
-GLfloat planeuv[] = {
-    0,1,
-    0,0,
-    1,0,
-    1,1,
 
-};
-GLfloat planeNor[] = {
-    0,1,0,
-    0,1,0,
-    0,1,0,
-    0,1,0
-};
 
 class SceneManager{
     private:
@@ -33,31 +17,31 @@ class SceneManager{
        
     public:
 
-        std::vector<Primitive> primitives;
+        std::vector< std::shared_ptr<Primitive> > primitives;
+        std::vector<Plane> planes;
         std::vector<Light> lights;
         Camera camera;
 
 
-        SceneManager() : camera(45.0f){
+        SceneManager(BMPLoader &texture) : camera(45.0f){
             // 背景平面の準備
-            Primitive plane(&camera);
-            for(int i=0;i<12;i++){
-                plane.positionData.push_back(planePos[i]);
-                plane.colorData.push_back(0);
-                plane.normalData.push_back(planeNor[i]);
-            }for(int i=0;i<8;i++){
-                plane.uvData.push_back(planeuv[i]);
-            }
-            plane.transform.position = glm::vec3(0,-6,0);
-            primitives.push_back(plane);
+            Plane plane(&camera);
+            
+            plane.texture = &texture;
+            // 奥
+            plane.transform.scale = glm::vec3(20,20,1);
+            plane.transform.position = glm::vec3(0,0,-10);
+            planes.push_back(plane);
 
-            plane.transform.position = glm::vec3(0,4,-10);
-            plane.transform.rotation = glm::vec3(90,0,0);
-            primitives.push_back(plane);
+            // 左
+            plane.transform.position = glm::vec3(-10,0,0);
+            plane.transform.rotation = glm::vec3(0,90,0);
+            planes.push_back(plane);
         
-             plane.transform.position = glm::vec3(-10,4,0);
-            plane.transform.rotation = glm:: vec3(0,0,-90);
-            primitives.push_back(plane);
+            // 下
+            plane.transform.position = glm::vec3(0,-10,0);
+            plane.transform.rotation = glm:: vec3(-90,0,0);
+            planes.push_back(plane);
 
         }
 
@@ -69,11 +53,18 @@ class SceneManager{
         void initScene(GLuint &shaderID){
             glClearColor(0.1f,0.1f,0.2f,1.0f);
             // glViewPort(1,1,1,1);
+           
+            Logger::Log("Init Planes");
+            for(auto &plane : planes){
+                plane.Init(shaderID);
+            }
 
+            Logger::Log("Init Primitives");
             for(auto &prim : primitives){
-                prim.Init(shaderID);
+                prim->Init(shaderID);
             }
             
+            Logger::Log("Init Lights");
             for(auto &light : lights){
                 light.Init(shaderID);
             }
@@ -92,8 +83,12 @@ class SceneManager{
                 light.Set(camera.getViewMatrix());
             }
 
+            for(auto plane : planes){
+                plane.Draw(shaderID);
+            }
+
             for(auto &prim : primitives){
-                prim.Draw(shaderID);
+                prim->Draw(shaderID);
             }
             
         }

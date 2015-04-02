@@ -16,18 +16,17 @@
 using namespace std;
 
 // 素材達　とりあえずここにドカドカ
-Material myMaterial;
 BMPLoader loader1;
 BMPLoader loader2;
+std::shared_ptr<Material> myMaterial(new Material());
 
 SceneManager makeScene(){
     SceneManager myScene(loader1);
-    myScene.camera.transform.position = glm::vec3(3,8,30);
+    myScene.camera.transform.position = glm::vec3(3,8,40);
 
-    
     std::random_device rnd;
     std::mt19937 mt( rnd() );
-    std::uniform_int_distribution<> rand100(-8,8);
+    std::uniform_int_distribution<> rand100(-10,10);
 
     for(int i=0;i<0;i++){
 
@@ -39,7 +38,7 @@ SceneManager makeScene(){
         cube->transform.scale = glm::vec3(2,2,2);
         cube->rotate = true;
 
-        cube->material = &myMaterial;
+        cube->material = myMaterial;
 
         myScene.primitives.push_back(cube);
     }
@@ -52,7 +51,7 @@ SceneManager makeScene(){
         torus->transform.scale = glm::vec3(3);
         torus->rotate = true;
 
-        torus->material = &myMaterial;
+        torus->material = myMaterial;
 
         myScene.primitives.push_back(torus);
     }
@@ -82,6 +81,12 @@ SceneManager makeScene(){
     light.La = glm::vec3(0.02,0.02,0.02);
     light.Ld = glm::vec3(0.4,0.4,0.4);
     light.Ls = glm::vec3(0.2,0.2,1.0);
+     myScene.addLight(light);
+
+    light.position = glm::vec4(100,50,-30,1);
+    light.La = glm::vec3(0.02,0.02,0.02);
+    light.Ld = glm::vec3(0.4,0.4,0.4);
+    light.Ls = glm::vec3(0.2,0.2,1.0);
     myScene.addLight(light);
 
    return myScene;
@@ -108,7 +113,7 @@ int main(int argc,char* argv[]){
     // glfwCreateWindow(width,height,title,monitor,share)
     //      monitor : 使用するモニタ　フルスクリーンでない場合にはNULLを指定
     //      share : 他のウィンドウとのリソースの共有に使う　windowのハンドルを指定
-    window = glfwCreateWindow(640,640, "Sample",NULL,NULL);
+    window = glfwCreateWindow(800,800, "Sample",NULL,NULL);
     if(!window){
         cout << "window open error" << endl;
         glfwTerminate();
@@ -144,7 +149,7 @@ int main(int argc,char* argv[]){
     SceneManager myScene = makeScene();
 
     myScene.initScene(programID);
-    myMaterial.Init(programID);
+    myMaterial->Init(programID);
 
     cout << "Draw Start" << endl;
 

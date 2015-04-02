@@ -28,7 +28,7 @@ class Camera{
 
         glm::mat4 getProjectionMatrix(){
             glm::mat4 projection = glm::perspective(
-                    45.0f,aspect,front,back);
+                    angle,aspect,front,back);
             return projection;
 
         }
@@ -37,7 +37,8 @@ class Camera{
         glm::mat4 getViewMatrix(){
 
             rotAngle+=0.0005f;
-            transform.position = glm::vec3(20*cos(rotAngle),transform.position.y,20*sin(rotAngle)+3);
+            transform.position = glm::vec3(30*cos(rotAngle),transform.position.y,30*sin(rotAngle));
+            // transform.position = glm::vec3(100 + 5*cos(rotAngle),30,10 + 5*sin(rotAngle));
             
             glm::mat4 view = glm::lookAt(
                     transform.position,

@@ -57,11 +57,6 @@ Torus::Torus(Camera* camera) : Primitive(camera){
         }
     }
 
-    std::cout << "torus positions :";
-    for(auto pos : indexData){
-        std::cout << " " << pos;
-    }std::cout << std::endl;
-
 }
 
 void Torus::Init(GLuint shaderID){

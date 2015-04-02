@@ -122,6 +122,8 @@ void Primitive::Draw(GLuint shaderID){
 
     // テクスチャの切り替え
     if(texture != NULL) texture->setTexture();
+    // マテリアルのセット
+    if(material != nullptr) material->Set();
 
     // 変換行列をシェーダーに送り込む
     glUniformMatrix4fv(ubo[0],1,GL_FALSE,&MVP[0][0]);

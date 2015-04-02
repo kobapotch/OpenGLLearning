@@ -26,7 +26,7 @@ class SceneManager{
         SceneManager(BMPLoader &texture) : camera(45.0f){
             // 背景平面の準備
             Plane plane(&camera);
-            
+
             plane.texture = &texture;
             // 奥
             plane.transform.scale = glm::vec3(40,40,1);
@@ -41,6 +41,11 @@ class SceneManager{
             // 下
             plane.transform.position = glm::vec3(0,-10,0);
             plane.transform.rotation = glm:: vec3(-90,0,0);
+            planes.push_back(plane);
+
+            plane.transform.scale = glm::vec3(100,100,1);
+            plane.transform.position = glm::vec3(100,0,0);
+            plane.transform.rotation = glm::vec3(-90,0,0);
             planes.push_back(plane);
 
         }

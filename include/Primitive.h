@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <vector>
+#include <memory>
 
 #include "Transform.h"
 #include "Camera.h"
@@ -44,7 +45,7 @@ class Primitive{
         std::vector<GLfloat> uvData;
 
         Transform transform;
-        Material* material;
+        std::shared_ptr<Material> material = nullptr;
         BMPLoader* texture;
 
         virtual void Init(GLuint shaderID);

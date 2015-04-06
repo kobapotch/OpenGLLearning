@@ -23,9 +23,17 @@ in vec3 fragmentNormal;
 in vec2 fragmentUV;
 
 uniform sampler2D textureSampler;
+uniform sampler2D texture2;
 
 out vec4 color;
 
+
+vec3 ToonShading(vec3 color){
+    
+    int levels = 5;
+    return ceil(color * levels) / levels; 
+
+}
 
 // フォーンモデルに基づくADS計算
 vec3 phongADS(vec4 pos, vec3 norm,int lightIndex){
@@ -67,8 +75,7 @@ vec3 BlinnPhongADS(vec4 pos, vec3 norm,int lightIndex){
     if(SdotN > 0.0)
         spec = Light[lightIndex].Ls * Material.Ks * pow( max(dot(h,norm),0.0), Material.shininess );
 
-    return (ambient + diffuse) * texture(textureSampler,fragmentUV).xyz + spec;
-
+    return ( ambient + diffuse)* texture(textureSampler,fragmentUV).rgb + spec;
 
 }
 
@@ -83,6 +90,8 @@ vec3 mazdaPractice(vec4 pos, vec3 norm, int lightIndex){
 }
 
 
+
+
 void main(){
     vec3 lightIntensity = vec3(0.0);
     for(int i=0;i<10;i++){
@@ -90,7 +99,7 @@ void main(){
     }
     // lightIntensity = mazdaPractice(fragmentPosition,fragmentNormal,0) * texture(textureSampler,fragmentUV).xyz;
     
-    color.rgb = (lightIntensity) ;
+    color.rgb = lightIntensity ;
 
     //color.rgb = color.rgb * 1 /( 1 +  0.01 * (-fragmentPosition.z)) 
    //  + vec3(0.005)*(-fragmentPosition.z);

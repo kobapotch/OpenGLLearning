@@ -3,98 +3,31 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include <fbxsdk.h>
+
 #include <iostream>
-#include <random>
-#include <new>
 #include <vector>
 #include <memory>
 
 #include "ShaderManager.h"
+#include "SceneMaker.h"
 #include "SceneManager.h"
-#include "BMPLoader.h"
+#include "ResourceManager.h"
 
 using namespace std;
 
-// 素材達　とりあえずここにドカドカ
-BMPLoader loader1;
-BMPLoader loader2;
-std::shared_ptr<Material> myMaterial(new Material());
-
-SceneManager makeScene(){
-    SceneManager myScene(loader1);
-    myScene.camera.transform.position = glm::vec3(3,8,40);
-
-    std::random_device rnd;
-    std::mt19937 mt( rnd() );
-    std::uniform_int_distribution<> rand100(-10,10);
-
-    for(int i=0;i<0;i++){
-
-        std::shared_ptr<Primitive> cube(new Cube(&myScene.camera) );
-        cube->texture = &loader2;
-
-        cube->transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
-        cube->transform.rotation = glm::vec3(rand100(mt)*100,rand100(mt)*100,rand100(mt)*100);
-        cube->transform.scale = glm::vec3(2,2,2);
-        cube->rotate = true;
-
-        cube->material = myMaterial;
-
-        myScene.primitives.push_back(cube);
-    }
-    for(int i=0;i<10;i++){
-        std::shared_ptr<Primitive> torus(new Torus(&myScene.camera) );
-        torus->texture = &loader2;
-
-        torus->transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
-        torus->transform.rotation = glm::vec3(rand100(mt)*100,rand100(mt)*100,rand100(mt)*100);
-        torus->transform.scale = glm::vec3(3);
-        torus->rotate = true;
-
-        torus->material = myMaterial;
-
-        myScene.primitives.push_back(torus);
-    }
-
-    std::shared_ptr<Primitive> cube(new Cube(&myScene.camera));
-    cube->transform.scale  = glm::vec3(2,2,2);
-    cube->transform.position = glm::vec3(0,0,0);
-    cube->transform.rotation = glm::vec3(0,0,0);
-    cube->rotate = false;
-    cube->texture = &loader2;
-    myScene.primitives.push_back(cube);
-
-    Light light;
-    light.position = glm::vec4(-15,-5,15,1);
-    light.La = glm::vec3(0.02,0.02,0.02);
-    light.Ld = glm::vec3(0.4,0.4,0.4);
-    light.Ls = glm::vec3(1.0,0.2,0.2);
-    myScene.addLight(light);
-
-    light.position = glm::vec4(-15,-5,-15,1);
-    light.La = glm::vec3(0.02,0.02,0.02);
-    light.Ld = glm::vec3(0.4,0.4,0.4);
-    light.Ls = glm::vec3(0.2,1.0,0.2);
-    myScene.addLight(light);
- 
-    light.position = glm::vec4(15,-5,-15,1);
-    light.La = glm::vec3(0.02,0.02,0.02);
-    light.Ld = glm::vec3(0.4,0.4,0.4);
-    light.Ls = glm::vec3(0.2,0.2,1.0);
-     myScene.addLight(light);
-
-    light.position = glm::vec4(100,50,-30,1);
-    light.La = glm::vec3(0.02,0.02,0.02);
-    light.Ld = glm::vec3(0.4,0.4,0.4);
-    light.Ls = glm::vec3(0.2,0.2,1.0);
-    myScene.addLight(light);
-
-   return myScene;
-}
-
-
-
 int main(int argc,char* argv[]){
+
+    // FBXファイルの読み込み
+    FbxManager* fbxManager = FbxManager::Create();
+    FbxImporter* fbxImporter = FbxImporter::Create(fbxManager,"Importer");
+    FbxScene* fbxScene = FbxScene::Create(fbxManager,"Scene");
+    const char* filename = "umbrella.fbx";
+    if(!fbxImporter->Initialize(filename)) cout << "fbx import failure" << endl;
+    fbxImporter->Import(fbxScene);
+    
+    cout << fbxScene->GetRootNode()->GetName() << endl;
+
 
     GLFWwindow* window;
 
@@ -135,21 +68,20 @@ int main(int argc,char* argv[]){
         << "OpenGL version : " << glGetString( GL_VERSION) << endl
         << "GLSL version : " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
-    // テクスチャの読み込み 
-    loader1.loadBMP(argc >=2 ? argv[1] :"hima.bmp");
-    loader1.makeTexture();
-    loader2.loadBMP(argc >=3 ? argv[2] :"garasubo.bmp");
-    loader2.makeTexture();
-
+    // シェーダーの準備
     ShaderManager shaderManager;
     shaderManager.compileVertexShader("VertexShader.glsl");
     shaderManager.compileFragmentShader("FragmentShader.glsl");
     GLuint programID = shaderManager.linkShader();
 
-    SceneManager myScene = makeScene();
+    ResourceManager resourceManager;
+    resourceManager.makeResource();
+
+    SceneMaker sceneMaker(resourceManager);
+    SceneManager myScene = sceneMaker.makeScene();
 
     myScene.initScene(programID);
-    myMaterial->Init(programID);
+    resourceManager.initResources(programID);
 
     cout << "Draw Start" << endl;
 
@@ -163,6 +95,10 @@ int main(int argc,char* argv[]){
     }
 
     glfwTerminate();
+
+    fbxScene->Destroy();
+    fbxImporter->Destroy();
+    fbxManager->Destroy();
 }
 
 

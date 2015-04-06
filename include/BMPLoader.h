@@ -7,6 +7,8 @@
 class BMPLoader{
 
     int ID;
+    int unit;
+    static const int unitMacro[];
 
     unsigned int dataPos;
     unsigned int width,height;
@@ -17,7 +19,7 @@ class BMPLoader{
 
 public:
     void loadBMP(const char* filename);
-    GLuint makeTexture();
+    GLuint makeTexture(int unit);
     GLuint getTextureID();
     void setTexture();
 

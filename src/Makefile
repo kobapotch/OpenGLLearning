@@ -1,17 +1,17 @@
 CFLAGS = -Wextra -g -std=c++11
-FRAMEWORKS = OpenGL
-LIBS = -lglfw3 -lGLEW
-INCLUDE = -I../include
+FRAMEWORKS = -framework OpenGL -framework SystemConfiguration -framework Carbon
+LIBS = -lglfw3 -lGLEW /Applications/Autodesk/FBX\ SDK/2015.1/lib/clang/debug/libfbxsdk.a
+INCLUDE = -I../include -I/Applications/Autodesk/FBX\ SDK/2015.1/include
 TARGET = ../bin/test
 OBJDIR = ./obj
 SOURCES = $(wildcard *.cpp)
 OBJECTS = $(addprefix $(OBJDIR)/, $(SOURCES:.cpp=.o))
 
 $(TARGET) : $(OBJECTS) 
-	g++ $(INCLUDE) -o $@ $^ -framework $(FRAMEWORKS) $(LIBS) 
+	g++ $(INCLUDE) $(FRAMEWORKS) $(LIBS) -o $@ $^ 
 
 $(OBJDIR)/%.o : %.cpp
-	g++ $(CFLAGS) $(INCLUDE) -framework $(FRAMEWORKS) $(LIBS) -o $@ -c $^
+	g++ $(CFLAGS) $(INCLUDE) $(FRAMEWORKS) $(LIBS) -o $@ -c $^
 
 all : clean $(TARGET)
 

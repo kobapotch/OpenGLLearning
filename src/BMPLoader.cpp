@@ -9,6 +9,9 @@
 
 using namespace std;
 
+const int BMPLoader::unitMacro[] = {
+    GL_TEXTURE0,GL_TEXTURE1,GL_TEXTURE2,GL_TEXTURE3};
+
 void BMPLoader::loadBMP(const char* filename){
     char header[54];
 
@@ -41,10 +44,11 @@ void BMPLoader::loadBMP(const char* filename){
 
 }
 
-GLuint BMPLoader::makeTexture(){
 
+GLuint BMPLoader::makeTexture(int unit){
+    this->unit = unit;
 
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(unitMacro[unit]);
 
     glGenTextures(1,&textureID);
 
@@ -68,8 +72,8 @@ GLuint BMPLoader::makeTexture(){
 }
 
 void BMPLoader::setTexture(){
-
-    glActiveTexture(GL_TEXTURE0);
+    
+    glActiveTexture(unitMacro[unit]);
     glBindTexture(GL_TEXTURE_2D,textureID);
     // glTexSubImage2D ( GL_TEXTURE_2D, 0, GL_RGB, width,height,0, GL_BGR,GL_UNSIGNED_BYTE, &data[0]);
 

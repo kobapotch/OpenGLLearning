@@ -75,9 +75,9 @@ class Cube : public Primitive{
 class Torus : public Primitive{
     private:
         static constexpr float majorRadius = 0.5f;
-        static constexpr int majorPrecision = 20;
+        static constexpr int majorPrecision = 40;
         static constexpr float minorRadius = 0.25f;
-        static constexpr int minorPrecision = 10;
+        static constexpr int minorPrecision = 20;
         
         GLuint ibo;
         std::vector<GLuint> indexData;

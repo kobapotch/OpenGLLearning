@@ -1,6 +1,8 @@
 #ifndef _KOBA_MATERIAL_INCLUDED
 #define _KOBA_MATERIAL_INCLUDED
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <vector>

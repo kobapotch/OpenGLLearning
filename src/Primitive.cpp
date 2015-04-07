@@ -86,7 +86,7 @@ void Primitive::Init(GLuint shaderID){
 
     glBindBuffer(GL_ARRAY_BUFFER,positionBufferHandle);
     glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,(void*)0);
-    
+
     glBindBuffer(GL_ARRAY_BUFFER,colorBufferHandle);
     glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,(void*)0);
 
@@ -109,10 +109,10 @@ void Primitive::Init(GLuint shaderID){
 float angle = 0;
 
 void Primitive::Draw(GLuint shaderID){
-   
+
     if(rotate){
         transform.rotation.y += 1.0f;}
-    
+
     glm::mat4 M = transform.getModelMatrix();
     glm::mat4 MV = camera->getViewMatrix() * M;
     glm::mat4 MVP = camera->getProjectionMatrix() * MV;
@@ -132,7 +132,7 @@ void Primitive::Draw(GLuint shaderID){
     // マルチテクスチャの番号を入れることに注意
     glUniform1i(ubo[3],0);
 
-   
+
     // プリミティブによって描画方法を変えられる
     DrawVertex();
 
@@ -140,11 +140,25 @@ void Primitive::Draw(GLuint shaderID){
 
     glBindVertexArray(0);
 
+    if(indexData.size() != 0){
+        glGenBuffers(1,&ibo);
+
+        // 頂点データをOpenGLに登録 
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,indexData.size() * sizeof(GLuint),&indexData[0],GL_STATIC_DRAW);
+    }
+
 }
 
 
 // デフォルトの描画方法
 void Primitive::DrawVertex(){
-    glDrawArrays(GL_TRIANGLES,0,positionData.size());
 
+    if(indexData.size() == 0){
+        glDrawArrays(GL_TRIANGLE_STRIP,0,positionData.size());
+    }
+    else{
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
+        glDrawElements(GL_TRIANGLES,indexData.size(),GL_UNSIGNED_INT,0);
+    }
 }

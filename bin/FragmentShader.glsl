@@ -30,8 +30,8 @@ out vec4 color;
 
 vec3 ToonShading(vec3 color){
     
-    int levels = 5;
-    return ceil(color * levels) / levels; 
+    int levels = 3;
+    return floor(color * levels) / levels; 
 
 }
 
@@ -75,7 +75,7 @@ vec3 BlinnPhongADS(vec4 pos, vec3 norm,int lightIndex){
     if(SdotN > 0.0)
         spec = Light[lightIndex].Ls * Material.Ks * pow( max(dot(h,norm),0.0), Material.shininess );
 
-    return ( ambient + diffuse)* texture(textureSampler,fragmentUV).rgb + spec;
+    return ambient + diffuse + spec;
 
 }
 
@@ -99,8 +99,8 @@ void main(){
     }
     // lightIntensity = mazdaPractice(fragmentPosition,fragmentNormal,0) * texture(textureSampler,fragmentUV).xyz;
     
-    color.rgb = lightIntensity ;
-
+    color.rgb = ToonShading(lightIntensity) * texture(textureSampler,fragmentUV).xyz;
+    
     //color.rgb = color.rgb * 1 /( 1 +  0.01 * (-fragmentPosition.z)) 
    //  + vec3(0.005)*(-fragmentPosition.z);
 

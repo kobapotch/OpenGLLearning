@@ -28,7 +28,7 @@ class Primitive{
         GLuint textureID = 0;
 
     protected:
-
+        GLuint ibo;
         // 頂点描画部分
         virtual void DrawVertex();
 
@@ -43,6 +43,8 @@ class Primitive{
         std::vector<GLfloat> colorData;
         std::vector<GLfloat> normalData;
         std::vector<GLfloat> uvData;
+
+        std::vector<GLuint> indexData; 
 
         Transform transform;
         std::shared_ptr<Material> material = nullptr;
@@ -78,9 +80,6 @@ class Torus : public Primitive{
         static constexpr int majorPrecision = 40;
         static constexpr float minorRadius = 0.25f;
         static constexpr int minorPrecision = 20;
-        
-        GLuint ibo;
-        std::vector<GLuint> indexData;
 
     protected:
         void DrawVertex();

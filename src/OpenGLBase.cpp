@@ -3,8 +3,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include <fbxsdk.h>
-
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -15,19 +13,9 @@
 #include "ResourceManager.h"
 
 using namespace std;
+    
 
 int main(int argc,char* argv[]){
-
-    // FBXファイルの読み込み
-    FbxManager* fbxManager = FbxManager::Create();
-    FbxImporter* fbxImporter = FbxImporter::Create(fbxManager,"Importer");
-    FbxScene* fbxScene = FbxScene::Create(fbxManager,"Scene");
-    const char* filename = "umbrella.fbx";
-    if(!fbxImporter->Initialize(filename)) cout << "fbx import failure" << endl;
-    fbxImporter->Import(fbxScene);
-    
-    cout << fbxScene->GetRootNode()->GetName() << endl;
-
 
     GLFWwindow* window;
 
@@ -96,9 +84,6 @@ int main(int argc,char* argv[]){
 
     glfwTerminate();
 
-    fbxScene->Destroy();
-    fbxImporter->Destroy();
-    fbxManager->Destroy();
 }
 
 

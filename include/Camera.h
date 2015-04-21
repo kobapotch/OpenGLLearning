@@ -37,7 +37,7 @@ class Camera{
         glm::mat4 getViewMatrix(){
 
             rotAngle+=0.0005f;
-            transform.position = glm::vec3(30*cos(rotAngle),transform.position.y,30*sin(rotAngle));
+            transform.position = glm::vec3(50*cos(rotAngle),transform.position.y,50*sin(rotAngle));
             // transform.position = glm::vec3(100 + 5*cos(rotAngle),30,10 + 5*sin(rotAngle));
             
             glm::mat4 view = glm::lookAt(

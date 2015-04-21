@@ -10,28 +10,11 @@
 
 
 
-glm::mat4 Projection = glm::perspective(
-        30.0f,
-        1.0f,
-        0.1f,
-        10.0f
-        );
-// LookAt関数
-// glm::lookAt(
-//      viewpoint   : 視点
-//      lookpoint   : 視対象
-//      up          : 上方をさすベクトル
-glm::mat4 View = glm::lookAt(
-        glm::vec3(2,2,4),
-        glm::vec3(0,0,0),
-        glm::vec3(0,1,0)
-        );
-
-
 Primitive::Primitive(Camera* m_camera){
     camera = m_camera;
 }
 Primitive::~Primitive(){
+    if(animation == NULL) delete animation;
 }
 /*
 Primitive::Primitive(const Primitive& obj){
@@ -100,9 +83,18 @@ void Primitive::Init(GLuint shaderID){
     ubo.push_back(glGetUniformLocation(shaderID,"MVP"));
     ubo.push_back(glGetUniformLocation(shaderID,"MV"));
     ubo.push_back(glGetUniformLocation(shaderID,"M"));
-    ubo.push_back(glGetUniformLocation(shaderID,"textureSampler"));
+    ubo.push_back(glGetUniformLocation(shaderID,"V"));
+    ubo.push_back(glGetUniformLocation(shaderID,"cameraPosition"));
 
     glBindVertexArray(0);
+
+    if(indexData.size() != 0){
+        glGenBuffers(1,&ibo);
+
+        // 頂点データをOpenGLに登録 
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,indexData.size() * sizeof(GLuint),&indexData[0],GL_STATIC_DRAW);
+    }
 
 }
 
@@ -110,12 +102,14 @@ float angle = 0;
 
 void Primitive::Draw(GLuint shaderID){
 
-    if(rotate){
-        transform.rotation.y += 1.0f;}
-
+    if(animation != NULL) {
+        Logger::Log("animate");
+        animation->Animate();
+    }
     glm::mat4 M = transform.getModelMatrix();
     glm::mat4 MV = camera->getViewMatrix() * M;
     glm::mat4 MVP = camera->getProjectionMatrix() * MV;
+    glm::mat4 V = camera->getViewMatrix();
 
     glUseProgram(shaderID);
     glBindVertexArray(vao);
@@ -129,9 +123,8 @@ void Primitive::Draw(GLuint shaderID){
     glUniformMatrix4fv(ubo[0],1,GL_FALSE,&MVP[0][0]);
     glUniformMatrix4fv(ubo[1],1,GL_FALSE,&MV[0][0]);
     glUniformMatrix4fv(ubo[2],1,GL_FALSE,&M[0][0]);
-    // マルチテクスチャの番号を入れることに注意
-    glUniform1i(ubo[3],0);
-
+    glUniformMatrix4fv(ubo[3],1,GL_FALSE,&V[0][0]);
+    glUniform3fv(ubo[4],1,&camera->transform.position[0]);
 
     // プリミティブによって描画方法を変えられる
     DrawVertex();
@@ -139,14 +132,6 @@ void Primitive::Draw(GLuint shaderID){
     glBindTexture(GL_TEXTURE_2D,0);
 
     glBindVertexArray(0);
-
-    if(indexData.size() != 0){
-        glGenBuffers(1,&ibo);
-
-        // 頂点データをOpenGLに登録 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,indexData.size() * sizeof(GLuint),&indexData[0],GL_STATIC_DRAW);
-    }
 
 }
 

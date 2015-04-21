@@ -7,8 +7,11 @@
 class BMPLoader{
 
     int ID;
+    // シェーダのテクスチャスロット番号
     int unit;
     static const int unitMacro[];
+
+    int ubo;
 
     unsigned int dataPos;
     unsigned int width,height;
@@ -19,7 +22,7 @@ class BMPLoader{
 
 public:
     void loadBMP(const char* filename);
-    GLuint makeTexture(int unit);
+    GLuint makeTexture(uint shaderID,int unit);
     GLuint getTextureID();
     void setTexture();
 

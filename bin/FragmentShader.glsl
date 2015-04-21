@@ -1,5 +1,6 @@
 #version 410 core
 
+
 struct MaterialInfo{
     vec3 Ka;    // アンビエント反射率
     vec3 Kd;    // ディフューズ反射率
@@ -21,9 +22,13 @@ in vec4 fragmentPosition;
 in vec4 fragmentColor;
 in vec3 fragmentNormal;
 in vec2 fragmentUV;
+in vec3 reflectDir;
 
-uniform sampler2D textureSampler;
-uniform sampler2D texture2;
+uniform mat4 V;
+
+uniform sampler2D textures[5];
+// キューブマップ
+uniform samplerCube cubeMap;
 
 out vec4 color;
 
@@ -53,7 +58,7 @@ vec3 phongADS(vec4 pos, vec3 norm,int lightIndex){
     if(SdotN > 0.0)
         spec = Light[lightIndex].Ls * Material.Ks * pow( max(dot(r,v),0.0), Material.shininess );
 
-    return ambient + diffuse + spec;
+    return (ambient + diffuse) * texture(textures[0],fragmentUV).xyz + spec;
 
 }
 
@@ -75,21 +80,9 @@ vec3 BlinnPhongADS(vec4 pos, vec3 norm,int lightIndex){
     if(SdotN > 0.0)
         spec = Light[lightIndex].Ls * Material.Ks * pow( max(dot(h,norm),0.0), Material.shininess );
 
-    return ambient + diffuse + spec;
+    return (ambient + diffuse) * texture(textures[0],fragmentUV).xyz + spec;
 
 }
-
-vec3 mazdaPractice(vec4 pos, vec3 norm, int lightIndex){
-    vec3 v = normalize(pos.xyz);
-    vec3 r = reflect(v,normalize(norm));
-    vec3 s = normalize(Light[lightIndex].position.xyz - pos.xyz);
-
-    float SdotR = dot(s,r);
-
-    return vec3(SdotR);
-}
-
-
 
 
 void main(){
@@ -97,9 +90,11 @@ void main(){
     for(int i=0;i<10;i++){
         lightIntensity += BlinnPhongADS(fragmentPosition,fragmentNormal,i);
     }
-    // lightIntensity = mazdaPractice(fragmentPosition,fragmentNormal,0) * texture(textureSampler,fragmentUV).xyz;
     
-    color.rgb = ToonShading(lightIntensity) * texture(textureSampler,fragmentUV).xyz;
+    color.rgb = lightIntensity;
+   
+    color.rgb = lightIntensity/2 + texture(cubeMap,reflectDir).xyz/2;
+    // color.rgb = texture(textureSampler,normalize(fragmentUV)).xyz;
     
     //color.rgb = color.rgb * 1 /( 1 +  0.01 * (-fragmentPosition.z)) 
    //  + vec3(0.005)*(-fragmentPosition.z);

@@ -45,7 +45,10 @@ void BMPLoader::loadBMP(const char* filename){
 }
 
 
-GLuint BMPLoader::makeTexture(int unit){
+GLuint BMPLoader::makeTexture(GLuint shaderID,int unit){
+
+    Logger::Log("Load Texture");
+
     this->unit = unit;
 
     glActiveTexture(unitMacro[unit]);
@@ -66,17 +69,24 @@ GLuint BMPLoader::makeTexture(int unit){
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 
+    string uniformstr = string("textures[") + std::to_string(0) + string("]");
+    ubo = glGetUniformLocation(shaderID,uniformstr.c_str());
+
     glBindTexture(GL_TEXTURE_2D,0);
+
+    Logger::Log("ubo is " + std::to_string(ubo));
 
     return textureID;
 }
 
 void BMPLoader::setTexture(){
-    
-    glActiveTexture(unitMacro[unit]);
-    glBindTexture(GL_TEXTURE_2D,textureID);
-    // glTexSubImage2D ( GL_TEXTURE_2D, 0, GL_RGB, width,height,0, GL_BGR,GL_UNSIGNED_BYTE, &data[0]);
 
+    glActiveTexture(unitMacro[unit]);
+    // GL側のテクスチャを呼ぶ
+    glBindTexture(GL_TEXTURE_2D,textureID);
+    // GLSL側にGLの持つテクスチャを転送する
+    glUniform1i(ubo,unit);
+    
 }
 
 

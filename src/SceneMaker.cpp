@@ -92,9 +92,10 @@ SceneManager SceneMaker::makeScene(){
     BMPLoader* hima = resourceManager->textures[0].get();
     BMPLoader* garasubo = resourceManager->textures[1].get();
 
-    SceneManager scene(hima);
+    SceneManager scene(resourceManager);
 
     scene.camera.transform.position = glm::vec3(3,8,40);
+    scene.cubeMap = resourceManager->cubeMap;
 
     std::random_device rnd;
     std::mt19937 mt( rnd() );
@@ -108,36 +109,45 @@ SceneManager SceneMaker::makeScene(){
         cube->transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
         cube->transform.rotation = glm::vec3(rand100(mt)*100,rand100(mt)*100,rand100(mt)*100);
         cube->transform.scale = glm::vec3(2,2,2);
-        cube->rotate = true;
 
         cube->material = resourceManager->materials[0];
 
         scene.primitives.push_back(cube);
     }
-    for(int i=0;i<10;i++){
+    for(int i=0;i<5;i++){
         std::shared_ptr<Primitive> torus(new Torus(&scene.camera) );
         torus->texture = garasubo;
 
         torus->transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
         torus->transform.rotation = glm::vec3(rand100(mt)*100,rand100(mt)*100,rand100(mt)*100);
         torus->transform.scale = glm::vec3(3);
-        torus->rotate = true;
 
         torus->material = resourceManager->materials[0];
 
-        // scene.primitives.push_back(torus);
+        scene.primitives.push_back(torus);
+    }
+    for(int i=0;i<5;i++){
+        std::shared_ptr<Primitive> sphere(new Sphere(&scene.camera) );
+        sphere->texture = garasubo;
+
+        sphere->transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
+
+        sphere->transform.scale = glm::vec3(3);
+
+        sphere->material = resourceManager->materials[0];
+
+        scene.primitives.push_back(sphere);
     }
 
     std::shared_ptr<Primitive> cube(new Cube(&scene.camera));
     cube->transform.scale  = glm::vec3(2,2,2);
     cube->transform.position = glm::vec3(0,0,0);
     cube->transform.rotation = glm::vec3(0,0,0);
-    cube->rotate = false;
     cube->texture = garasubo;
     // scene.primitives.push_back(cube);
 
 
-    /*------------------- FBXファイルの読み込み----------------------*/
+/*------------------- FBXファイルの読み込み----------------------*/
 
     FbxManager* fbxManager = FbxManager::Create();
 
@@ -146,7 +156,7 @@ SceneManager SceneMaker::makeScene(){
 
     // importerはファイルを読み込んでシーンに渡すだけ
     FbxImporter* fbxImporter = FbxImporter::Create(fbxManager,"Importer");
-    const char* filename = "umbrella.fbx";
+    const char* filename = "voronoi2.fbx";
     if(!fbxImporter->Initialize(filename,-1,fbxManager->GetIOSettings())){
         cout << "fbx import failure" << endl;
         cout << "Error of " << fbxImporter->GetStatus().GetErrorString() << endl;
@@ -166,31 +176,31 @@ SceneManager SceneMaker::makeScene(){
     fbxScene->Destroy();
     fbxManager->Destroy();
 
-
+/*-------------------------ライトの設定-----------------------------*/
 
     Light light;
     light.position = glm::vec4(-15,-5,15,1);
     light.La = glm::vec3(0.02,0.02,0.02);
-    light.Ld = glm::vec3(0.4,0.4,0.4);
+    light.Ld = glm::vec3(0.5,0.2,0.2);
     light.Ls = glm::vec3(1.0,0.2,0.2);
     scene.addLight(light);
 
     light.position = glm::vec4(-15,-5,-15,1);
     light.La = glm::vec3(0.02,0.02,0.02);
-    light.Ld = glm::vec3(0.4,0.4,0.4);
+    light.Ld = glm::vec3(0.2,0.5,0.2);
     light.Ls = glm::vec3(0.2,1.0,0.2);
     scene.addLight(light);
 
     light.position = glm::vec4(15,-5,-15,1);
     light.La = glm::vec3(0.02,0.02,0.02);
-    light.Ld = glm::vec3(0.4,0.4,0.4);
+    light.Ld = glm::vec3(0.2,0.2,0.5);
     light.Ls = glm::vec3(0.2,0.2,1.0);
     scene.addLight(light);
 
-    light.position = glm::vec4(100,50,-30,1);
+    light.position = glm::vec4(15,15,15,1);
     light.La = glm::vec3(0.02,0.02,0.02);
-    light.Ld = glm::vec3(0.4,0.4,0.4);
-    light.Ls = glm::vec3(0.2,0.2,1.0);
+    light.Ld = glm::vec3(0.5,0.5,0.5);
+    light.Ls = glm::vec3(1.0,1.0,1.0);
     scene.addLight(light);
 
     return scene;
@@ -199,16 +209,62 @@ SceneManager SceneMaker::makeScene(){
 
 void SceneMaker::FbxToMyScene(FbxScene* fbxScene,SceneManager& scene){
 
-    
+
 
     FbxNode* rootNode = fbxScene->GetRootNode();
 
     cout << rootNode->GetName() << endl;
-    cout << rootNode->GetChildCount() << endl;
 
-    FbxDouble3 translation = rootNode->LclTranslation.Get();
-    cout << "Translation : " 
-        << translation[0] << "," << translation[1] << "," << translation[2] << endl;
+    cout << "GetMaterial" << endl;
+    int materialCount = fbxScene->GetMaterialCount();
+    for(int i=0;i<materialCount;i++){
+        FbxSurfaceMaterial* material = fbxScene->GetMaterial(i);
+        if(material->GetClassId().Is(FbxSurfacePhong::ClassId)){
+
+            cout << "Phong Material" << endl;
+            FbxSurfacePhong* phongMaterial = (FbxSurfacePhong*)material;
+
+            shared_ptr<Material> mat(new Material);
+            for(int m = 0;m<3;m++){
+
+                mat->Ka[m] = phongMaterial->Ambient.Get()[m];
+                mat->Kd[m] = phongMaterial->Diffuse.Get()[m];
+                mat->Ks[m] = phongMaterial->Specular.Get()[m];
+            }
+            mat->shininess = phongMaterial->Shininess;
+
+            cout << "Material Info :" << endl;
+            cout << "ambient (" << mat->Ka[0] << "," << mat->Ka[1] << "," << mat->Ka[2] << endl;
+            cout << "diffuse (" << mat->Kd[0] << "," << mat->Kd[1] << "," << mat->Kd[2] << endl;
+            cout << "specular (" << mat->Ks[0] << "," << mat->Ks[1] << "," << mat->Ks[2] << endl;
+
+
+            resourceManager->materials.push_back(mat);
+
+        }else if(material->GetClassId().Is(FbxSurfaceLambert::ClassId)){
+            cout << "Lambert Material" << endl;
+
+            FbxSurfaceLambert* lambertMaterial = (FbxSurfaceLambert*)material;
+            shared_ptr<Material> mat(new Material);
+            for(int m=0;m<3;m++){
+                mat->Ka[m] = lambertMaterial->Ambient.Get()[m];
+                mat->Kd[m] = lambertMaterial->Diffuse.Get()[m];
+                mat->Ks[m] = 0;
+            }
+            mat->shininess = 0;
+
+            cout << "Material Info :" << endl;
+            cout << "ambient (" << mat->Ka[0] << "," << mat->Ka[1] << "," << mat->Ka[2] << endl;
+            cout << "diffuse (" << mat->Kd[0] << "," << mat->Kd[1] << "," << mat->Kd[2] << endl;
+            cout << "specular (" << mat->Ks[0] << "," << mat->Ks[1] << "," << mat->Ks[2] << endl;
+
+
+            resourceManager->materials.push_back(mat);
+        }
+
+    }
+
+
 
 
     cout << "Show Attibute Data" << endl;
@@ -247,7 +303,7 @@ void SceneMaker::RecursiveMakeMesh(FbxNode* node,SceneManager& scene){
 
 shared_ptr<Primitive> SceneMaker::meshToPrimitive(FbxMesh* mesh,Camera& camera){
     shared_ptr<Primitive> prim(new Primitive(&camera));
-    prim->material = resourceManager->materials[0];
+    prim->material = resourceManager->materials[resourceManager->materials.size()-1];
     prim->texture = resourceManager->textures[1].get();
 
     prim->transform.scale = glm::vec3(0.3,0.3,0.3);
@@ -261,19 +317,19 @@ shared_ptr<Primitive> SceneMaker::meshToPrimitive(FbxMesh* mesh,Camera& camera){
     int layerNum = mesh->GetLayerCount();
     Logger::Log("layerNum : " + std::to_string(layerNum));
     FbxGeometryElementNormal* normalElem = mesh->GetElementNormal();
-    
+
     if(normalElem != 0){
 
         FbxGeometryElement::EMappingMode mappingMode = normalElem->GetMappingMode();
         FbxGeometryElement::EReferenceMode refMode = normalElem->GetReferenceMode();
-    
+
         // マッピングモードとリファレンスモードそれぞれで場合分けしてメッシュを取得する
         // ポリゴンとは別のコントロールポイントに格納されている場合
         if( mappingMode == FbxGeometryElement::eByControlPoint){
             Logger::Log("mappingMode : eByControlPoint");
 
             for(int vertexIndex=0;vertexIndex<mesh->GetControlPointsCount();vertexIndex++){
-                
+
                 int normalIndex = 0;
                 if(refMode == FbxGeometryElement::eDirect){
                     normalIndex = vertexIndex;
@@ -285,17 +341,17 @@ shared_ptr<Primitive> SceneMaker::meshToPrimitive(FbxMesh* mesh,Camera& camera){
                 for(int k = 0;k<3;k++) prim->normalData.push_back(normal[k]);
             }
 
-         // ポリゴンごとに法線が格納されている
+            // ポリゴンごとに法線が格納されている
         }else if(mappingMode == FbxGeometryElement::eByPolygonVertex){
             Logger::Log("mappingMode : eByPolygonVertex");
 
             int indexByPolygonVertex = 0;
-            
+
             for(int polygonIndex=0;polygonIndex < mesh->GetPolygonCount();polygonIndex++){
 
                 // ポリゴン頂点のサイズ
                 int polygonSize = mesh->GetPolygonSize(polygonIndex);
-                
+
                 for(int i=0;i<polygonSize;i++){
                     int normalIndex = 0;
 
@@ -320,7 +376,7 @@ shared_ptr<Primitive> SceneMaker::meshToPrimitive(FbxMesh* mesh,Camera& camera){
             prim->colorData.push_back(0.5);
             // prim->normalData.push_back(vertexs[i][j]);
         } 
-        
+
     }cout << endl;
     for(int i=0;i<vertexNum;i++){
         prim->uvData.push_back(0);
@@ -339,8 +395,8 @@ shared_ptr<Primitive> SceneMaker::meshToPrimitive(FbxMesh* mesh,Camera& camera){
     }
 
 
-cout << "meshToPrimitive" << endl;
+    cout << "meshToPrimitive" << endl;
 
-return prim;
+    return prim;
 
 }

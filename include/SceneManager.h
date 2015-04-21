@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 
+#include "ResourceManager.h"
 #include "Primitive.h"
 #include "Camera.h"
 #include "Light.h"
@@ -13,40 +14,50 @@
 
 class SceneManager{
     private:
-
+        
        
     public:
 
         std::vector< std::shared_ptr<Primitive> > primitives;
-        std::vector<Plane> planes;
+        std::vector<std::shared_ptr<Plane> > planes;
         std::vector<Light> lights;
         Camera camera;
 
+        shared_ptr<CubeMap> cubeMap;
 
-        SceneManager(BMPLoader* texture) : camera(45.0f){
+        SceneManager(ResourceManager* resourceManager) : camera(45.0f){
             // 背景平面の準備
             Plane plane(&camera);
 
-            plane.texture = texture;
+            std::shared_ptr<Material> mat(new Material);
+            resourceManager->materials.push_back(mat);
+            std::shared_ptr<BMPLoader> texture = resourceManager->textures[0];
+
             // 奥
-            plane.transform.scale = glm::vec3(40,40,1);
-            plane.transform.position = glm::vec3(0,10,-20);
-            planes.push_back(plane);
+            std::shared_ptr<Plane> planeBack(new Plane(&camera));
+            planeBack->texture = texture.get();
+            planeBack->material = mat;
+            planeBack->transform.scale = glm::vec3(40,40,1);
+            planeBack->transform.position = glm::vec3(0,10,-20);
+            planes.push_back(planeBack);
 
             // 左
-            plane.transform.position = glm::vec3(-20,10,0);
-            plane.transform.rotation = glm::vec3(0,90,0);
-            planes.push_back(plane);
+            std::shared_ptr<Plane> planeLeft(new Plane(&camera));
+            planeLeft->texture = texture.get();
+            planeLeft->material = mat;
+            planeLeft->transform.scale = glm::vec3(40,40,1);
+            planeLeft->transform.position = glm::vec3(-20,10,0);
+            planeLeft->transform.rotation = glm::vec3(0,90,0);
+            planes.push_back(planeLeft);
         
             // 下
-            plane.transform.position = glm::vec3(0,-10,0);
-            plane.transform.rotation = glm:: vec3(-90,0,0);
-            planes.push_back(plane);
-
-            plane.transform.scale = glm::vec3(100,100,1);
-            plane.transform.position = glm::vec3(100,0,0);
-            plane.transform.rotation = glm::vec3(-90,0,0);
-            planes.push_back(plane);
+            std::shared_ptr<Plane> planeButtom(new Plane(&camera));
+            planeButtom->texture = texture.get();
+            planeButtom->material = mat;
+            planeButtom->transform.scale = glm::vec3(100,100,1);
+            planeButtom->transform.position = glm::vec3(0,-10,0);
+            planeButtom->transform.rotation = glm::vec3(-90,0,0);
+            planes.push_back(planeButtom);
 
         }
 
@@ -61,7 +72,7 @@ class SceneManager{
            
             Logger::Log("Init Planes");
             for(auto &plane : planes){
-                plane.Init(shaderID);
+                plane->Init(shaderID);
             }
 
             Logger::Log("Init Primitives");
@@ -84,12 +95,14 @@ class SceneManager{
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUseProgram(shaderID);
 
+            cubeMap->setCubeMap();
+
             for(auto light : lights){
                 light.Set(camera.getViewMatrix());
             }
 
-            for(auto plane : planes){
-                plane.Draw(shaderID);
+            for(auto &plane : planes){
+                plane->Draw(shaderID);
             }
 
             for(auto &prim : primitives){

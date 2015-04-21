@@ -10,6 +10,9 @@
 #include "Camera.h"
 #include "Material.h"
 #include "BMPLoader.h"
+#include "Animation.h"
+
+class Animation;
 
 class Primitive{
 
@@ -36,8 +39,6 @@ class Primitive{
         Primitive(Camera*);
         ~Primitive();
 
-        bool rotate = false;
-
         // 頂点生データ 
         std::vector<GLfloat> positionData;
         std::vector<GLfloat> colorData;
@@ -49,6 +50,7 @@ class Primitive{
         Transform transform;
         std::shared_ptr<Material> material = nullptr;
         BMPLoader* texture;
+        Animation* animation = NULL;
 
         virtual void Init(GLuint shaderID);
         void SetTexture(GLuint id){ textureID = id;}
@@ -72,6 +74,19 @@ class Cube : public Primitive{
     public:
         Cube(Camera*);
 };
+
+// 球
+class Sphere : public Primitive{
+    private:
+        static constexpr float radius = 1;
+        static constexpr int precision = 20;
+    protected:
+        void DrawVertex();
+    public:
+        Sphere(Camera*);
+        void Init(GLuint shaderID);
+};
+
 
 // トーラス
 class Torus : public Primitive{

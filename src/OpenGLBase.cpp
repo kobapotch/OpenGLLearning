@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <chrono>
 
 #include "ShaderManager.h"
 #include "SceneMaker.h"
@@ -34,7 +35,7 @@ int main(int argc,char* argv[]){
     // glfwCreateWindow(width,height,title,monitor,share)
     //      monitor : 使用するモニタ　フルスクリーンでない場合にはNULLを指定
     //      share : 他のウィンドウとのリソースの共有に使う　windowのハンドルを指定
-    window = glfwCreateWindow(800,800, "Sample",NULL,NULL);
+    window = glfwCreateWindow(1280,800, "Sample",NULL,NULL);
     if(!window){
         cout << "window open error" << endl;
         glfwTerminate();
@@ -62,7 +63,7 @@ int main(int argc,char* argv[]){
     shaderManager.compileFragmentShader("FragmentShader.glsl");
     GLuint programID = shaderManager.linkShader();
 
-    ResourceManager resourceManager;
+    ResourceManager resourceManager(programID);
     resourceManager.makeResource();
 
     SceneMaker sceneMaker(resourceManager);
@@ -73,13 +74,31 @@ int main(int argc,char* argv[]){
 
     cout << "Draw Start" << endl;
 
+    glViewport(0,0,1280*2,800*2);
+
+
+    // 時間測定準備
+    std::chrono::time_point<std::chrono::system_clock> start,end;
+    int counter = 0;
+
     while(!glfwWindowShouldClose(window)){
+        start = std::chrono::system_clock::now();
 
         myScene.drawScene(programID);
 
+        
         glfwSwapBuffers(window);
         glfwPollEvents();
         // glfwWaitEvents();
+        
+        end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+        if(counter%100==0){
+        cout << "FPS : " <<  1 / elapsed_seconds.count() << endl;
+        counter=0;
+        }
+        counter++;
+        
     }
 
     glfwTerminate();

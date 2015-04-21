@@ -7,19 +7,25 @@
 #include "Material.h"
 #include "BMPLoader.h"
 #include "Logger.h"
-
+#include "CubeMap.h"
 
 class ResourceManager{
+    int shaderID;
     
     public:
 
         std::vector<std::shared_ptr<Material> > materials;
         std::vector<std::shared_ptr<BMPLoader> > textures;
+        std::shared_ptr<CubeMap> cubeMap;
 
-        void loadTexture(const char* filename){
+        ResourceManager(int shaderID){
+            this->shaderID = shaderID;
+        }
+
+        void loadTexture(const char* filename,int unit){
             std::shared_ptr<BMPLoader> texture(new BMPLoader);
             texture->loadBMP(filename);
-            texture->makeTexture(0);            
+            texture->makeTexture(shaderID,unit);            
             textures.push_back(texture);
         }
 
@@ -27,8 +33,15 @@ class ResourceManager{
             
             Logger::Log("Make Resources");
 
-            loadTexture("hima.bmp");
-            loadTexture("garasubo.bmp");
+            loadTexture("hima.bmp",0);
+            loadTexture("garasubo.bmp",0);
+
+            std::shared_ptr<CubeMap> cMap(new CubeMap);
+            cMap->loadCubeTex("right.bmp","left.bmp",
+                    "up.bmp","down.bmp",
+                    "front.bmp","back.bmp"
+                    );
+            cubeMap = cMap;
 
             std::shared_ptr<Material> mat(new Material);
             materials.push_back(mat);
@@ -39,6 +52,8 @@ class ResourceManager{
             for(auto mat : materials){
                 mat->Init(shaderID);
             }
+            cubeMap->makeCubeMap(shaderID,2);
+
         }
 
 };

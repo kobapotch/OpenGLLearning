@@ -2,21 +2,18 @@
 #define _KOBA_CUBEMAP_INCLUDED
 
 #include <vector>
+#include <opencv2/opencv.hpp>
 
 class CubeMap{ 
     private:
         int ubo;
         int unit;
 
-        unsigned int dataPos;
-    unsigned int width,height;
-    unsigned int imageSize;
 
         // posx,negx ... negzの順に画像データを格納する
-        std::vector<unsigned char> data[6];
+        cv::Mat image[6];
 
         unsigned int textureID;
-
         static const int unitMacro[];
 
     public:

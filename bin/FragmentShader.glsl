@@ -22,7 +22,11 @@ in vec4 fragmentPosition;
 in vec4 fragmentColor;
 in vec3 fragmentNormal;
 in vec2 fragmentUV;
-in vec3 reflectDir;
+
+in vec3 worldPos;
+in vec3 worldNor;
+
+uniform vec3 cameraPosition;
 
 uniform mat4 V;
 
@@ -92,11 +96,10 @@ void main(){
     }
     
     color.rgb = lightIntensity;
-   
-    color.rgb = lightIntensity/2 + texture(cubeMap,reflectDir).xyz/2;
-    // color.rgb = texture(textureSampler,normalize(fragmentUV)).xyz;
     
-    //color.rgb = color.rgb * 1 /( 1 +  0.01 * (-fragmentPosition.z)) 
-   //  + vec3(0.005)*(-fragmentPosition.z);
+    vec3 worldView = normalize(worldPos - cameraPosition);
+    vec3 reflectDir = reflect(worldView,worldNor); 
+   color.rgb = lightIntensity/3 + texture(cubeMap,reflectDir).xyz*2/3;
+    
 
 }

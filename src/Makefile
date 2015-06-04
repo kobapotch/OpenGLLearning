@@ -1,6 +1,6 @@
 CFLAGS = -Wextra -g -std=c++11
 FRAMEWORKS = -framework OpenGL -framework SystemConfiguration -framework Carbon
-LIBS = -lglfw3 -lGLEW /Applications/Autodesk/FBX\ SDK/2015.1/lib/clang/debug/libfbxsdk.a
+LIBS = -lglfw3 -lGLEW /Applications/Autodesk/FBX\ SDK/2015.1/lib/clang/debug/libfbxsdk.a `pkg-config --cflags --libs opencv`
 INCLUDE = -I../include -I/Applications/Autodesk/FBX\ SDK/2015.1/include
 TARGET = ../bin/test
 OBJDIR = ./obj

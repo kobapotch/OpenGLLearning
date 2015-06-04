@@ -103,7 +103,6 @@ float angle = 0;
 void Primitive::Draw(GLuint shaderID){
 
     if(animation != NULL) {
-        Logger::Log("animate");
         animation->Animate();
     }
     glm::mat4 M = transform.getModelMatrix();

@@ -17,8 +17,9 @@ out vec4 fragmentPosition;
 out vec4 fragmentColor;
 out vec3 fragmentNormal;
 out vec2 fragmentUV;
-out vec3 reflectDir;
 
+out vec3 worldPos;
+out vec3 worldNor;
 out vec4 viewPosition;
 
 void main(){
@@ -37,10 +38,8 @@ void main(){
     fragmentUV = vertexUV;
 
     // 反射方向の計算
-    vec3 worldPos = vec3( M * vec4(vertexPosition_modelspace,1));
-    vec3 worldNor = normalize(vec3( M * vec4(vertexNormal,0)).xyz);
-    vec3 worldView = normalize(worldPos - cameraPosition);
-    reflectDir = reflect(worldView,worldNor);
+    worldPos = vec3( M * vec4(vertexPosition_modelspace,1));
+    worldNor = normalize(vec3( M * vec4(vertexNormal,0)).xyz);
 
 }
 

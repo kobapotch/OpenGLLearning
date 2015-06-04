@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include "Transform.h"
+#include "Animation.h"
 
 class Camera{
     private:
@@ -15,6 +16,7 @@ class Camera{
 
     public:
         Transform transform;
+        Animation* animation;
 
         float angle;
 
@@ -22,8 +24,13 @@ class Camera{
             this->angle = angle;
             aspect = 1.0f;
             front = 0.1f;
-            back = 100.0f;
+            back = 1000.0f;
 
+            // animation = new CircleTurningAnimation(&transform);
+            animation = new ArrowKeyAnimation(&transform);
+        }
+        ~Camera(){
+            if(animation != NULL) delete animation;
         }
 
         glm::mat4 getProjectionMatrix(){
@@ -36,10 +43,6 @@ class Camera{
         float rotAngle=0;
         glm::mat4 getViewMatrix(){
 
-            rotAngle+=0.0005f;
-            transform.position = glm::vec3(50*cos(rotAngle),transform.position.y,50*sin(rotAngle));
-            // transform.position = glm::vec3(100 + 5*cos(rotAngle),30,10 + 5*sin(rotAngle));
-            
             glm::mat4 view = glm::lookAt(
                     transform.position,
                     glm::vec3(0,0,0),

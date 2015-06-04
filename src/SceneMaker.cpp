@@ -6,6 +6,7 @@
 #include "SceneMaker.h"
 #include "Primitive.h"
 #include "BMPLoader.h"
+#include "Animation.h"
 
 using namespace std;
 
@@ -89,8 +90,8 @@ SceneMaker::SceneMaker(ResourceManager& rManager){
 
 SceneManager SceneMaker::makeScene(){
 
-    BMPLoader* hima = resourceManager->textures[0].get();
-    BMPLoader* garasubo = resourceManager->textures[1].get();
+    Texture* hima = resourceManager->textures[0].get();
+    Texture* garasubo = resourceManager->textures[1].get();
 
     SceneManager scene(resourceManager);
 
@@ -124,15 +125,17 @@ SceneManager SceneMaker::makeScene(){
 
         torus->material = resourceManager->materials[0];
 
+        torus->animation = new RotateAnimation(&torus->transform);
+
         scene.primitives.push_back(torus);
     }
-    for(int i=0;i<5;i++){
+    for(int i=0;i<2;i++){
         std::shared_ptr<Primitive> sphere(new Sphere(&scene.camera) );
         sphere->texture = garasubo;
 
         sphere->transform.position = glm::vec3(rand100(mt),rand100(mt),rand100(mt));
 
-        sphere->transform.scale = glm::vec3(3);
+        sphere->transform.scale = glm::vec3(5);
 
         sphere->material = resourceManager->materials[0];
 

@@ -9,10 +9,11 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "Material.h"
-#include "BMPLoader.h"
+#include "Texture.h"
 #include "Animation.h"
 
 class Animation;
+class Camera;
 
 class Primitive{
 
@@ -49,7 +50,7 @@ class Primitive{
 
         Transform transform;
         std::shared_ptr<Material> material = nullptr;
-        BMPLoader* texture;
+        Texture* texture;
         Animation* animation = NULL;
 
         virtual void Init(GLuint shaderID);

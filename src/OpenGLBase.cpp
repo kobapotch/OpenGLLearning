@@ -12,8 +12,14 @@
 #include "SceneMaker.h"
 #include "SceneManager.h"
 #include "ResourceManager.h"
+#include "Input.h"
 
 using namespace std;
+
+
+void input(GLFWwindow* window,unsigned int codepoint,int mods){
+    cout << "input: " << codepoint << "," << mods << endl;
+}
     
 
 int main(int argc,char* argv[]){
@@ -72,6 +78,11 @@ int main(int argc,char* argv[]){
     myScene.initScene(programID);
     resourceManager.initResources(programID);
 
+
+    // キー入力コールバックの登録
+    glfwSetCharModsCallback(window,input);
+    Input* input = Input::createInstance(window);
+
     cout << "Draw Start" << endl;
 
     glViewport(0,0,1280*2,800*2);
@@ -81,6 +92,7 @@ int main(int argc,char* argv[]){
     std::chrono::time_point<std::chrono::system_clock> start,end;
     int counter = 0;
 
+    // メインループ
     while(!glfwWindowShouldClose(window)){
         start = std::chrono::system_clock::now();
 
@@ -90,6 +102,8 @@ int main(int argc,char* argv[]){
         glfwSwapBuffers(window);
         glfwPollEvents();
         // glfwWaitEvents();
+        //
+        input->getKeyDirection();
         
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;

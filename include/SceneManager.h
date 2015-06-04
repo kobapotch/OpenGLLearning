@@ -31,7 +31,7 @@ class SceneManager{
 
             std::shared_ptr<Material> mat(new Material);
             resourceManager->materials.push_back(mat);
-            std::shared_ptr<BMPLoader> texture = resourceManager->textures[0];
+            std::shared_ptr<Texture> texture = resourceManager->textures[0];
 
             // 奥
             std::shared_ptr<Plane> planeBack(new Plane(&camera));
@@ -96,6 +96,8 @@ class SceneManager{
             glUseProgram(shaderID);
 
             cubeMap->setCubeMap();
+
+            if(camera.animation != NULL) camera.animation->Animate();
 
             for(auto light : lights){
                 light.Set(camera.getViewMatrix());

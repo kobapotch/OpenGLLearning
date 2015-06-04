@@ -1,5 +1,6 @@
 
 #include <GLFW/glfw3.h>
+#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <fstream>
 
@@ -17,35 +18,17 @@ void CubeMap::loadCubeTex(const char* posx,const char* negx,
 
     const char* filenames[] = { posx,negx,posy,negy,posz,negz};
 
+    Logger::Log("Load CubeMap");
+
     for(int i=0;i<6;i++){
-        char header[54];
 
-        ifstream ifs(filenames[i],ios::binary);
-        if(!ifs) {
-            cout << "can't open file : " << filenames[i] << endl;
+        image[i] = cv::imread(filenames[i],1);
+        if(image[i].data==NULL){
+            cout << "imagefile read error in " << filenames[i] << endl;
             return;
         }
-
-        // ヘッダの読み込み
-        ifs.read(header,54);
-        if(ifs.bad() || header[0] != 'B' || header[1] != 'M'){
-            cout << filenames[i] << " is not BMP" << endl;
-            return;
-        }
-        for(int i=0;i<54;i++){
-            cout << header[i] ;
-        }cout << endl;
-        dataPos = *(int*)&(header[0x0A]);
-        imageSize = *(int*)&(header[0x22]);
-        width = *(int*)&(header[0x12]);
-        height = *(int*)&(header[0x16]);
-        cout << dataPos << " : " << imageSize << " : " << width << " : " << height << endl; 
-
-        char buf;
-        while(ifs.get(buf)){
-            data[i].push_back(buf);
-        }
-        cout << "datasize" << data[i].size() << " in " << width * height* 3 <<  endl;
+        cout << "image " << filenames[i] << " loaded" << endl;
+        cout << "width:" << image[i].cols << " height:" << image[i].rows << endl;
 
     }
 
@@ -62,7 +45,7 @@ void CubeMap::makeCubeMap(unsigned int shaderID,int unit){
         GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
     };
 
-    Logger::Log("Load CubeMap");
+    Logger::Log("Make CubeMap");
 
     this->unit = unit;
 
@@ -74,8 +57,15 @@ void CubeMap::makeCubeMap(unsigned int shaderID,int unit){
     glBindTexture(GL_TEXTURE_CUBE_MAP,textureID);
 
     for(int i=0;i<6;i++){
+        if(image[i].elemSize() == 3){
+            Logger::Log("RGB image");
+            glTexImage2D(targets[i],0,GL_RGB,image[i].cols,image[i].rows,0,GL_BGR,GL_UNSIGNED_BYTE,image[i].data);
+        }else if(image[i].elemSize() == 4){
+            Logger::Log("RGBA image");
+            glTexImage2D(targets[i],0,GL_RGBA,image[i].cols,image[i].rows,0,GL_BGRA,GL_UNSIGNED_BYTE,image[i].data);
+        }
 
-        glTexImage2D(targets[i],0,GL_RGB,width,height,0,GL_BGR,GL_UNSIGNED_BYTE,&data[i][0]);
+
     }
 
     glTexParameterf(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
